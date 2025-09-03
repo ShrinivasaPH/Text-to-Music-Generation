@@ -1,0 +1,6 @@
+torch 
+torchaudio 
+transformers 
+accelerate
+soundfile
+streamlit  
