@@ -1,8 +1,9 @@
-streamlit
-torch 
-torchaudio 
-transformers 
-accelerate
-soundfile
-numpy
-pandas
+streamlit>=1.28.0
+torch>=2.0.0
+torchaudio>=2.0.0
+transformers>=4.35.0
+accelerate>=0.24.0
+soundfile>=0.12.1
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.10.0
