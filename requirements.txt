@@ -1,6 +1,8 @@
+streamlit
 torch 
 torchaudio 
 transformers 
 accelerate
 soundfile
-streamlit  
+numpy
+pandas
