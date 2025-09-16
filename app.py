@@ -4,10 +4,13 @@ from transformers import AutoProcessor, MusicgenForConditionalGeneration
 import soundfile as sf
 import tempfile
 import os
+<<<<<<< HEAD
 import gc
 import time
 import psutil
 from threading import Timer
+=======
+>>>>>>> parent of c32c885 (Update from Claude)
 
 # Streamlit Cloud configuration
 st.set_page_config(
@@ -23,6 +26,7 @@ def is_streamlit_cloud():
 IS_CLOUD = is_streamlit_cloud()
 
 st.title("🎶 Text-to-Music BGM Generator")
+<<<<<<< HEAD
 if IS_CLOUD:
     st.markdown("🌐 **Running on Streamlit Cloud** - Powered by cloud CPUs!")
 else:
@@ -37,6 +41,9 @@ if IS_CLOUD:
     - 🎵 Recommended: 5-10 second audio clips
     - 🔄 App may restart if memory limit exceeded
     """)
+=======
+st.markdown("Generate background scores for narration using Meta’s MusicGen.")
+>>>>>>> parent of c32c885 (Update from Claude)
 
 # System resource monitoring
 def get_system_resources():
@@ -73,6 +80,7 @@ with st.sidebar:
 
 # Cloud-optimized settings
 st.sidebar.header("Settings")
+<<<<<<< HEAD
 
 # Force small model for cloud deployment
 model_choice = "facebook/musicgen-small"
@@ -91,6 +99,11 @@ length = st.sidebar.slider(
     max_value=max_length,
     value=default_length,
     help="Shorter clips work best on Streamlit Cloud due to memory limits"
+=======
+model_choice = st.sidebar.selectbox(
+    "Choose MusicGen Model",
+    ["facebook/musicgen-small", "facebook/musicgen-medium", "facebook/musicgen-large"]
+>>>>>>> parent of c32c885 (Update from Claude)
 )
 
 # Cloud-specific performance settings
@@ -103,6 +116,7 @@ with st.sidebar.expander("⚙️ Performance Settings"):
         low_memory_mode = st.checkbox("Low Memory Mode", value=False)
         aggressive_cleanup = st.checkbox("Aggressive Cleanup", value=False)
 
+<<<<<<< HEAD
 # Timeout handler for cloud
 class TimeoutHandler:
     def __init__(self, timeout_seconds=540):  # 9 minutes (before 10min limit)
@@ -405,3 +419,44 @@ else:
         - Use shorter clips for faster results
         - Consider upgrading to a machine with more RAM/faster CPU
         """)
+=======
+# Load model + processor (cached)
+@st.cache_resource
+def load_model(model_name):
+    model = MusicgenForConditionalGeneration.from_pretrained(model_name)
+    processor = AutoProcessor.from_pretrained(model_name)
+    return model, processor
+
+model, processor = load_model(model_choice)
+
+# Text input
+prompt = st.text_area("🎤 Enter your prompt:", 
+    "Calm and spiritual background music with bansuri flute and soft tabla, suitable for Ramayana narration."
+)
+
+if st.button("Generate Music"):
+    if prompt.strip() == "":
+        st.warning("Please enter a description.")
+    else:
+        with st.spinner("🎼 Generating music..."):
+            inputs = processor(
+                text=[prompt],
+                padding=True,
+                return_tensors="pt",
+            )
+
+            with torch.no_grad():
+                audio_values = model.generate(**inputs, max_new_tokens=length * 20)  
+                # approx 20 tokens per sec
+
+            # Save temp file
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
+                sf.write(tmp.name, audio_values[0, 0].cpu().numpy(), model.config.audio_encoder.sampling_rate)
+                audio_path = tmp.name
+
+        st.success("✅ Music generated!")
+        st.audio(audio_path, format="audio/wav")
+
+        with open(audio_path, "rb") as f:
+            st.download_button("⬇️ Download Music", f, file_name="generated_bgm.wav", mime="audio/wav")
+>>>>>>> parent of c32c885 (Update from Claude)
